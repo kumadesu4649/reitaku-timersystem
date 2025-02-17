@@ -19,7 +19,7 @@
             margin: 20px;
         }
         .buttons button {
-            font-size: 30px;
+            font-size:15px;
             margin: 10px;
             padding: 15px 30px;
         }
@@ -35,7 +35,9 @@
             <button onclick="stopStopwatch()">ストップ</button>
             <button onclick="resetStopwatch()">リセット</button>
         </div>
-        <h2>タイマー</h2>
+        &nbsp;
+        
+        <h2>終了まで</h2>
         <div id="timer-display" class="time-display">00:00:00</div>
         <div class="buttons">
             <button onclick="startTimer()">スタート</button>
@@ -54,11 +56,11 @@
 
         function startStopwatch() {
             if (!stopwatchRunning) {
-                stopwatchRunning = true;
-                stopwatchTimer = setInterval(() => {
-                    elapsedTime++;
-                    updateStopwatchDisplay();
-                }, 1000);
+            stopwatchRunning = true;
+            stopwatchTimer = setInterval(() => {
+                elapsedTime++;
+                updateStopwatchDisplay();
+            }, 1000);
             }
         }
 
@@ -79,25 +81,26 @@
             let minutes = Math.floor((elapsedTime % 3600) / 60);
             let seconds = elapsedTime % 60;
             document.getElementById("stopwatch-display").textContent =
-                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
         let timer;
-        let countdownTime = 300; // 5分タイマー
+        let countdownTime = 0; // 5分タイマー
         let timerRunning = false;
 
         function startTimer() {
             if (!timerRunning) {
-                timerRunning = true;
-                timer = setInterval(() => {
-                    if (countdownTime > 0) {
-                        countdownTime--;
-                        updateTimerDisplay();
-                    } else {
-                        clearInterval(timer);
-                        timerRunning = false;
-                    }
-                }, 1000);
+            timerRunning = true;
+            timer = setInterval(() => {
+                if (countdownTime > 0) {
+                countdownTime--;
+                updateTimerDisplay();
+                } else {
+                clearInterval(timer);
+                timerRunning = false;
+                document.getElementById("timer-display").style.color = "red";
+                }
+            }, 1000);
             }
         }
 
@@ -111,11 +114,13 @@
             timerRunning = false;
             countdownTime = 0;
             updateTimerDisplay();
+            document.getElementById("timer-display").style.color = "black";
         }
 
         function addTime(seconds) {
             countdownTime += seconds;
             updateTimerDisplay();
+            document.getElementById("timer-display").style.color = "black";
         }
 
         function updateTimerDisplay() {
@@ -123,7 +128,7 @@
             let minutes = Math.floor((countdownTime % 3600) / 60);
             let seconds = countdownTime % 60;
             document.getElementById("timer-display").textContent =
-                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
         updateTimerDisplay();
     </script>
