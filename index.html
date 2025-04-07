@@ -60,6 +60,7 @@
             stopwatchTimer = setInterval(() => {
                 elapsedTime++;
                 updateStopwatchDisplay();
+                updateBackgroundColor();
             }, 1000);
             }
         }
@@ -74,6 +75,7 @@
             stopwatchRunning = false;
             elapsedTime = 0;
             updateStopwatchDisplay();
+            document.body.style.backgroundColor = "#f4f4f4"; // Reset background color
         }
 
         function updateStopwatchDisplay() {
@@ -83,6 +85,44 @@
             document.getElementById("stopwatch-display").textContent =
             `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
+
+        function interpolateColor(color1, color2, factor) {
+    const result = color1.slice();
+    for (let i = 0; i < 3; i++) {
+        result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
+    }
+    return result;
+}
+
+function rgbToCSS(rgbArray) {
+    return `rgb(${rgbArray[0]}, ${rgbArray[1]}, ${rgbArray[2]})`;
+}
+
+function updateBackgroundColor() {
+    const colorWhite = [244, 244, 244];  // 初期背景
+    const colorOrange = [255, 165, 0];   // 3分時点
+    const colorRed = [255, 0, 0];        // 5分時点
+
+    let bgColor;
+
+    if (elapsedTime < 240) {
+        // 0:00〜3:59 → 白
+        bgColor = colorWhite;
+    } else if (elapsedTime < 270) {
+        // 4:00〜4:29 → 白 → オレンジ
+        let factor = (elapsedTime - 240) / 30;  // 0〜1 に正規化
+        bgColor = interpolateColor(colorWhite, colorOrange, factor);
+    } else if (elapsedTime < 300) {
+        // 4:30〜4:59 → オレンジ → 赤
+        let factor = (elapsedTime - 270) / 30;  // 0〜1 に正規化
+        bgColor = interpolateColor(colorOrange, colorRed, factor);
+    } else {
+        // 5:00以降 → 赤
+        bgColor = colorRed;
+    }
+
+    document.body.style.backgroundColor = rgbToCSS(bgColor);
+}
 
         let timer;
         let countdownTime = 0; // 5分タイマー
