@@ -24,30 +24,60 @@
             padding: 15px 30px;
         }
     </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 </head>
 <body>
     <div class="container">
         <h1>残り時間表示</h1>
-        <h2>スタートから</h2>
+        <h2><i class="bi bi-stopwatch"></i>スタートから</h2>
         <div id="stopwatch-display" class="time-display">00:00:00</div>
         <div class="buttons">
             <button onclick="startStopwatch()">スタート</button>
             <button onclick="stopStopwatch()">ストップ</button>
             <button onclick="resetStopwatch()">リセット</button>
         </div>
+
+        <h2><i class="bi bi-gear-fill"></i>タイマー色変化タイミング設定</h2>
+        <div class="buttons">
+            <label>
+                白→オレンジ開始:
+                <input type="number" id="orangeStartMin" value="4" min="0">分
+                <input type="number" id="orangeStartSec" value="0" min="0" max="59">秒
+            </label><br>
+        
+            <label>
+                オレンジ→赤開始:
+                <input type="number" id="redStartMin" value="4" min="0">分
+                <input type="number" id="redStartSec" value="30" min="0" max="59">秒
+            </label><br>
+        
+            <label>
+                赤固定開始:
+                <input type="number" id="fullRedMin" value="5" min="0">分
+                <input type="number" id="fullRedSec" value="0" min="0" max="59">秒
+            </label><br>
+        
+            <button onclick="applyColorSettings()">設定</button>
+        </div>
+
         &nbsp;
         
-        <h2>終了まで</h2>
+        <h2><i class="bi bi-alarm"></i>終了まで</h2>
         <div id="timer-display" class="time-display">00:00:00</div>
         <div class="buttons">
             <button onclick="startTimer()">スタート</button>
             <button onclick="stopTimer()">ストップ</button>
             <button onclick="resetTimer()">リセット</button>
+            <br>
             <button onclick="addTime(10)">+10s</button>
             <button onclick="addTime(30)">+30s</button>
             <button onclick="addTime(60)">+1m</button>
         </div>
     </div>
+
+
+
     
     <script>
         let stopwatchTimer;
@@ -99,29 +129,42 @@ function rgbToCSS(rgbArray) {
 }
 
 function updateBackgroundColor() {
-    const colorWhite = [244, 244, 244];  // 初期背景
-    const colorOrange = [255, 165, 0];   // 3分時点
-    const colorRed = [255, 0, 0];        // 5分時点
+    const colorWhite = [244, 244, 244];
+    const colorOrange = [255, 165, 0];
+    const colorRed = [255, 0, 0];
 
     let bgColor;
 
-    if (elapsedTime < 240) {
-        // 0:00〜3:59 → 白
+    if (elapsedTime < orangeStartTime) {
+        // 白
         bgColor = colorWhite;
-    } else if (elapsedTime < 270) {
-        // 4:00〜4:29 → 白 → オレンジ
-        let factor = (elapsedTime - 240) / 30;  // 0〜1 に正規化
+    } else if (elapsedTime < redStartTime) {
+        // 白 → オレンジ
+        let factor = (elapsedTime - orangeStartTime) / (redStartTime - orangeStartTime);
         bgColor = interpolateColor(colorWhite, colorOrange, factor);
-    } else if (elapsedTime < 300) {
-        // 4:30〜4:59 → オレンジ → 赤
-        let factor = (elapsedTime - 270) / 30;  // 0〜1 に正規化
+    } else if (elapsedTime < fullRedTime) {
+        // オレンジ → 赤
+        let factor = (elapsedTime - redStartTime) / (fullRedTime - redStartTime);
         bgColor = interpolateColor(colorOrange, colorRed, factor);
     } else {
-        // 5:00以降 → 赤
+        // 赤
         bgColor = colorRed;
     }
 
     document.body.style.backgroundColor = rgbToCSS(bgColor);
+}
+
+
+function applyColorSettings() {
+    const getSeconds = (minId, secId) => {
+        const minutes = parseInt(document.getElementById(minId).value) || 0;
+        const seconds = parseInt(document.getElementById(secId).value) || 0;
+        return (minutes * 60) + seconds;
+    };
+
+    orangeStartTime = getSeconds("orangeStartMin", "orangeStartSec");
+    redStartTime = getSeconds("redStartMin", "redStartSec");
+    fullRedTime = getSeconds("fullRedMin", "fullRedSec");
 }
 
         let timer;
