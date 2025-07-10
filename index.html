@@ -173,19 +173,32 @@ function applyColorSettings() {
         let countdownTime = 0; // 5分タイマー
         let timerRunning = false;
 
+        // 新規追加：タイマーの背景色更新関数
+function updateTimerBackgroundColor() {
+    if (countdownTime <= 30) {
+        document.getElementById("timer-display").style.backgroundColor = "red";
+    } else if (countdownTime <= 60) {
+        document.getElementById("timer-display").style.backgroundColor = "orange";
+    } else {
+        document.getElementById("timer-display").style.backgroundColor = ""; // デフォルト
+    }
+}
+
         function startTimer() {
             if (!timerRunning) {
-            timerRunning = true;
-            timer = setInterval(() => {
-                if (countdownTime > 0) {
-                countdownTime--;
-                updateTimerDisplay();
-                } else {
-                clearInterval(timer);
-                timerRunning = false;
-                document.getElementById("timer-display").style.color = "red";
-                }
-            }, 1000);
+                timerRunning = true;
+                timer = setInterval(() => {
+                    if (countdownTime > 0) {
+                        countdownTime--;
+                        updateTimerDisplay();
+                        updateTimerBackgroundColor();
+                    } else {
+                        clearInterval(timer);
+                        timerRunning = false;
+                        updateTimerBackgroundColor();
+                        // (必要に応じて他の終了時処理を保持)
+                    }
+                }, 1000);
             }
         }
 
@@ -200,12 +213,14 @@ function applyColorSettings() {
             countdownTime = 0;
             updateTimerDisplay();
             document.getElementById("timer-display").style.color = "black";
+            updateTimerBackgroundColor();
         }
 
         function addTime(seconds) {
             countdownTime += seconds;
             updateTimerDisplay();
             document.getElementById("timer-display").style.color = "black";
+            updateTimerBackgroundColor();
         }
 
         function updateTimerDisplay() {
